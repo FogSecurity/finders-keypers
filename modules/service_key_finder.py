@@ -134,6 +134,11 @@ def find_kms_key_usage(session, key_region, input_key_arn, key_resources):
         except Exception as e:
             logging.error(f"Error with MQ Module: {e}")
 
+        try:
+            find_acm_key_usage(session, key_region,
+                               input_key_arn, key_resources)
+        except Exception as e:
+            logging.error(f"Error with ACM Module: {e}")
 
 def key_resources_append(service, resource, arn, context, key_resources):
     key_resources.append({
@@ -161,6 +166,19 @@ def find_key_aliases(session, key_region, input_key_arn):
         #key_aliases_arns.append(key['AliasArn'])
     
     return key_aliases
+
+
+def find_acm_key_usage(session, key_region, input_key_arn, key_resources):
+    acm_pca_client = session.client('acm-pca', region_name=key_region)
+
+    ca_list_response = acm_pca_client.list_certificate_authorities()
+    for ca_summary in ca_list_response.get('CertificateAuthorities', []):
+        ca_arn = ca_summary['Arn']
+
+        ca_details = acm_pca_client.describe_certificate_authority(CertificateAuthorityArn=ca_arn)
+        kms_key_id = ca_details['CertificateAuthority'].get('KeyId')
+        if kms_key_id == input_key_arn:
+            key_resources_append('ACM Private CA', 'Certificate Authority', ca_arn, 'CA Key Material Encryption', key_resources)
 
 def find_ebs_key_usage(session, key_region, input_key_arn, key_resources):
     #EBS Volumes
