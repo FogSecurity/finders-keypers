@@ -20,7 +20,7 @@ Blog Post: [https://www.fogsecurity.io/blog/introducing-finders-keypers-a-tool-t
 ### Running
 
 ```
- python3 finders-keypers.py --keyarn arn:aws:kms:us-east-1:123412341234:key/aaaaaaaa-aaaa-1111-aaaa-aaaa1111aaaa 
+ python3 finders_keypers.py --keyarn arn:aws:kms:us-east-1:123412341234:key/aaaaaaaa-aaaa-1111-aaaa-aaaa1111aaaa 
 
 ```
 
@@ -34,7 +34,7 @@ The tool will scan resources for KMS Key Usage and output the following:
 * ARN, resource identifier, or description (if ARN is unavailable)
 
 ```
-python3 finders-keypers.py --keyarn arn:aws:kms:us-east-1:123412341234:key/aaaaaaaa-aaaa-1111-aaaa-aaaa1111aaaa                   
+python3 finders_keypers.py --keyarn arn:aws:kms:us-east-1:123412341234:key/aaaaaaaa-aaaa-1111-aaaa-aaaa1111aaaa                   
 
 Total Number of Resources encrypted with KMS Key Provided: 5
 example-bucket-finderskeypers
