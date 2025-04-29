@@ -49,7 +49,7 @@ Key Usage Finder can be run in `--verbose` mode which will output more details o
 * Service Name, Resource Type, ARN (or resource identifier), and encryption context.
 
 ```
-python3 finders-keypers.py --keyarn arn:aws:kms:us-east-1:123412341234:key/aaaaaaaa-aaaa-1111-aaaa-aaaa1111aaaa --verbose                       
+python3 finders_keypers.py --keyarn arn:aws:kms:us-east-1:123412341234:key/aaaaaaaa-aaaa-1111-aaaa-aaaa1111aaaa --verbose                       
 
 Total Number of Resources encrypted with KMS Key Provided: 6
 {'Service': 'Glue', 'Resource': 'Data Catalog', 'ARN': 'ARN', 'Context': 'Connection Password Encryption'}
