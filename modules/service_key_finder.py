@@ -1,5 +1,7 @@
 import sys
 import boto3
+import logging
+
 
 def find_kms_key_usage(session, key_region, input_key_arn, key_resources):
 
@@ -16,117 +18,121 @@ def find_kms_key_usage(session, key_region, input_key_arn, key_resources):
     if key_description['KeyMetadata']['KeyManager'] == 'AWS':
         #AWS Managed Key should only have 1 alias.
         alias = find_key_aliases(session, key_region, input_key_arn)
-        
-        service = alias[0][10:] #Remove alias/aws/
-        print(service)
 
-        try:
-            func = "find_" + service + "_key_usage(session, key_region, input_key_arn, key_resources)"
-            exec(func)
-        except:
-            print("Error with Managed Key and " + service + " Module.")
+        if str(alias[0]).startswith('alias/aws/'):
+            service = alias[0][10:]  # Remove alias/aws/
+
+            try:
+                func = f"find_{service}_key_usage(session, key_region, input_key_arn, key_resources)"
+                exec(func)
+            except Exception as e:
+                logging.error(
+                    f"A managed key check for the {service} has not been defined yet.")
+        else:
+            logging.error(
+                f"A conflict between KeyMetadata and the alias has occurred in {alias[0]} with KeyManager: {key_description['KeyMetadata']['KeyManager']}")
 
     else:
     #Non Managed Key can be used across multiple services.
         try:
             find_glue_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with Glue Module.")
-        
+        except Exception as e:
+            logging.error(f"Error with Glue Module: {e}")
+
         try:
             find_s3_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with S3 Module")
+        except Exception as e:
+            logging.error(f"Error with S3 Module: {e}")
 
         try:
             find_ebs_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with EBS Module")
-        
+        except Exception as e:
+            logging.error(f"Error with EBS Module: {e}")
+
         try:
             find_qldb_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with QLDB Module")
+        except Exception as e:
+            logging.error(f"Error with QLDB Module: {e}")
 
         try:
             find_keyspaces_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with Keyspaces Module")
-        
+        except Exception as e:
+            logging.error(f"Error with Keyspaces Module: {e}")
+
         try:
             find_timestream_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with Timestream Module")
-        
+        except Exception as e:
+            logging.error(f"Error with Timestream Module: {e}")
+
         try:
             find_dynamodb_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with DynamoDB Module")
-        
+        except Exception as e:
+            logging.error(f"Error with DynamoDB Module: {e}")
+
         try:
             find_neptune_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with Neptune Module")
-        
+        except Exception as e:
+            logging.error(f"Error with Neptune Module: {e}")
+
         try:
             find_secretsmanager_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with Secrets Manager Module")
-        
+        except Exception as e:
+            logging.error(f"Error with Secrets Manager Module: {e}")
+
         try:
             find_ssm_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with SSM Module")
-        
+        except Exception as e:
+            logging.error(f"Error with SSM Module: {e}")
+
         try:
             find_redshift_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with Redshift Module")
-        
+        except Exception as e:
+            logging.error(f"Error with Redshift Module: {e}")
+
         try:
             find_redshiftserverless_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with Redshift Serverless Module")
-        
+        except Exception as e:
+            logging.error(f"Error with Redshift Serverless Module: {e}")
+
         try:
             find_elasticfilesystem_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with EFS Module")
-        
+        except Exception as e:
+            logging.error(f"Error with EFS Module: {e}")
+
         try:
             find_elasticache_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with Elasticache Module")
-        
+        except Exception as e:
+            logging.error(f"Error with Elasticache Module: {e}")
+
         try:
             find_docdb_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with DocumentDB Module")
-        
+        except Exception as e:
+            logging.error(f"Error with DocumentDB Module: {e}")
+
         try:
             find_rds_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with RDS Module")
+        except Exception as e:
+            logging.error(f"Error with RDS Module: {e}")
 
         try: 
             find_sqs_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with SQS Module")
+        except Exception as e:
+            logging.error(f"Error with SQS Module: {e}")
 
         try:
             find_sns_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with SNS Module")
+        except Exception as e:
+            logging.error(f"Error with SNS Module: {e}")
 
         try:
             find_fsx_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with FSx Module")
+        except Exception as e:
+            logging.error(f"Error with FSx Module: {e}")
 
         try:
             find_mq_key_usage(session, key_region, input_key_arn, key_resources)
-        except:
-            print("Error with MQ Module")
+        except Exception as e:
+            logging.error(f"Error with MQ Module: {e}")
 
 
 def key_resources_append(service, resource, arn, context, key_resources):
