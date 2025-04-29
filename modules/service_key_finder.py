@@ -140,6 +140,25 @@ def find_kms_key_usage(session, key_region, input_key_arn, key_resources):
         except Exception as e:
             logging.error(f"Error with ACM Module: {e}")
 
+        try:
+            find_dms_key_usage(session, key_region,
+                               input_key_arn, key_resources)
+        except Exception as e:
+            logging.error(f"Error with DMS Module: {e}")
+
+        try:
+            find_lambda_key_usage(session, key_region,
+                                  input_key_arn, key_resources)
+        except Exception as e:
+            logging.error(f"Error with Lambda Module: {e}")
+
+        try:
+            find_es_key_usage(session, key_region,
+                              input_key_arn, key_resources)
+        except Exception as e:
+            logging.error(f"Error with Elasticsearch Module: {e}")
+
+
 def key_resources_append(service, resource, arn, context, key_resources):
     key_resources.append({
         'Service': service,
@@ -179,6 +198,60 @@ def find_acm_key_usage(session, key_region, input_key_arn, key_resources):
         kms_key_id = ca_details['CertificateAuthority'].get('KeyId')
         if kms_key_id == input_key_arn:
             key_resources_append('ACM Private CA', 'Certificate Authority', ca_arn, 'CA Key Material Encryption', key_resources)
+
+def find_dms_key_usage(session, key_region, input_key_arn, key_resources):
+    dms_client = session.client('dms', region_name=key_region)
+
+    replication_instances = dms_client.describe_replication_instances()
+    for instance in replication_instances.get('ReplicationInstances', []):
+        kms_key_id = instance.get('KmsKeyId')
+        if kms_key_id == input_key_arn:
+            key_resources_append('DMS', 'Replication Instance',
+                                 instance['ReplicationInstanceIdentifier'], 'Encryption At Rest', key_resources)
+
+    endpoints = dms_client.describe_endpoints()
+    for endpoint in endpoints.get('Endpoints', []):
+        kms_key_id = endpoint.get('KmsKeyId')
+        if kms_key_id == input_key_arn:
+            key_resources_append(
+                'DMS', 'Endpoint', endpoint['EndpointIdentifier'], 'Encrypted Connection Info', key_resources)
+
+
+def find_lambda_key_usage(session, key_region, input_key_arn, key_resources):
+    lambda_client = session.client('lambda', region_name=key_region)
+
+    paginator = lambda_client.get_paginator('list_functions')
+    for page in paginator.paginate():
+        for function in page['Functions']:
+            function_name = function['FunctionName']
+
+            # Get full config to check KMS key
+            config = lambda_client.get_function_configuration(
+                FunctionName=function_name)
+
+            kms_key_arn = config.get('KMSKeyArn')
+            if kms_key_arn == input_key_arn:
+                key_resources_append('Lambda', 'Function', function_name,
+                                     'Environment Variable Encryption', key_resources)
+
+
+def find_es_key_usage(session, key_region, input_key_arn, key_resources):
+    es_client = session.client('es', region_name=key_region)
+
+    domains_response = es_client.list_domain_names()
+    for domain_info in domains_response.get('DomainNames', []):
+        domain_name = domain_info['DomainName']
+
+        domain_details = es_client.describe_elasticsearch_domain(
+            DomainName=domain_name)
+        encryption_config = domain_details['DomainStatus'].get(
+            'EncryptionAtRestOptions', {})
+
+        kms_key_id = encryption_config.get('KmsKeyId')
+        if kms_key_id == input_key_arn:
+            key_resources_append('Elasticsearch', 'Domain',
+                                 domain_name, 'Encryption At Rest', key_resources)
+
 
 def find_ebs_key_usage(session, key_region, input_key_arn, key_resources):
     #EBS Volumes
@@ -487,7 +560,7 @@ def find_elasticache_key_usage(session, key_region, input_key_arn, key_resources
 
     for replication_group in elasticache_replication_group_results['ReplicationGroups']:
         if replication_group['AtRestEncryptionEnabled']:
-            if replication_group['KmsKeyId'] == input_key_arn:
+            if replication_group.get('KmsKeyId', 'DISABLED') == input_key_arn:
                 key_resources_append('Elasticache', 'Replication Group', replication_group['ARN'], 'Encryption At Rest', key_resources) 
 
 def find_docdb_key_usage(session, key_region, input_key_arn, key_resources):
@@ -679,7 +752,7 @@ def find_sqs_key_usage(session, key_region, input_key_arn, key_resources):
 
     key_descriptors.append(key_id)
 
-    for queue in sqs_queue_results['QueueUrls']:
+    for queue in sqs_queue_results.get('QueueUrls', []):
         queue_attributes = sqs_client.get_queue_attributes(
             QueueUrl = queue,
             AttributeNames = [
