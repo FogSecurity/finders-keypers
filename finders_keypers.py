@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(prog='KMS Key Usage Finder')
 
 def kms_key_arn (input_key_arn):
     if not re.match(
-        "^arn:aws:kms:(af|il|ap|ca|eu|me|sa|us|cn)-(central|north|northeast|northwest|south|southeast|southwest|east|west)-\d{1}:\d{12}:key\/[a-zA-Z0-9-]*$"
+        r"^arn:aws:kms:(af|il|ap|ca|eu|me|sa|us|cn)-(central|north|northeast|northwest|south|southeast|southwest|east|west)-\d:\d{12}:key/[a-zA-Z0-9-]*$"
         , input_key_arn):
         sys.exit("Not a valid KMS Key ARN")
 
