@@ -330,11 +330,27 @@ def find_neptune_key_usage(session, key_region, input_key_arn, key_resources):
                 key_resources_append('Neptune', 'Neptune Culster', cluster_arn, 'Encryption At Rest', key_resources)
 
 def find_secretsmanager_key_usage(session, key_region, input_key_arn, key_resources):
- 
-    #Secrets
     
-    secretsmanager_client = session.client('secretsmanager', region_name=key_region)
+    # Find secrets in Secrets Manager that use the specified KMS key.
 
+    secretsmanager_client = session.client('secretsmanager', region_name=key_region)
+    
+    # Create a list of key identifiers to handle different reference formats
+    key_aliases = find_key_aliases(session, key_region, input_key_arn)
+    
+    key_descriptors = key_aliases
+    key_descriptors.append(input_key_arn)
+    
+    # Get Key ID from ARN to handle ID-only references
+    kms_client = session.client('kms', region_name=key_region)
+    key_description = kms_client.describe_key(
+        KeyId = input_key_arn
+    )
+    key_id = key_description['KeyMetadata']['KeyId']
+    
+    key_descriptors.append(key_id)
+    
+    # Get all secrets and check for key usage
     secret_results = (
         secretsmanager_client.get_paginator('list_secrets')
         .paginate()
@@ -342,9 +358,8 @@ def find_secretsmanager_key_usage(session, key_region, input_key_arn, key_resour
     )
 
     for secret in secret_results['SecretList']:
-        if secret.get('KmsKeyId') == input_key_arn:
-            key_resources_append('Secrets Manager', 'Secret', secret.get('ARN'), 'Encryption At Rest', key_resources) 
-
+        if secret.get('KmsKeyId') in key_descriptors:
+            key_resources_append('Secrets Manager', 'Secret', secret.get('ARN'), 'Encryption At Rest', key_resources)
 
 def find_ssm_key_usage(session, key_region, input_key_arn, key_resources):
     
