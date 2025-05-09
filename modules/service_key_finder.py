@@ -179,11 +179,11 @@ def find_glue_key_usage(session, key_region, input_key_arn, key_resources):
     glue_client = session.client('glue', region_name=key_region)
     data_catalog_encryption_settings = glue_client.get_data_catalog_encryption_settings()
 
-    data_catalog_encryption_key_arn = data_catalog_encryption_settings['DataCatalogEncryptionSettings']['EncryptionAtRest']['SseAwsKmsKeyId']
+    data_catalog_encryption_key_arn = data_catalog_encryption_settings.get('DataCatalogEncryptionSettings', {}).get('EncryptionAtRest', {}).get('SseAwsKmsKeyId', 'Disabled')
     if data_catalog_encryption_key_arn == input_key_arn:
         key_resources_append('Glue', 'Data Catalog', 'Glue Data Catalog', 'Encryption at Rest', key_resources)
 
-    conn_pass_enc_key = data_catalog_encryption_settings['DataCatalogEncryptionSettings']['ConnectionPasswordEncryption']['AwsKmsKeyId']
+    conn_pass_enc_key = data_catalog_encryption_settings.get('DataCatalogEncryptionSettings', {}).get('ConnectionPasswordEncryption', {}).get('AwsKmsKeyId', 'Disabled')
     if conn_pass_enc_key == input_key_arn:
         key_resources_append('Glue', 'Data Catalog', 'Glue Data Catalog Password Encryption', 'Connection Password Encryption', key_resources)
 

@@ -53,5 +53,5 @@ try:
             print (key_resources[key_index]['arn'])
             key_index = key_index + 1
 
-except:
-    print("Error while running Key Usage Finder")
+except Exception as e:
+    print(f"Error while running Key Usage Finder: {e}")
