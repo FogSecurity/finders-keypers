@@ -61,6 +61,14 @@ Total Number of Resources encrypted with KMS Key Provided: 6
 
 ```
 
+### Saving Data
+
+Finders Keypers now has an option to save run data to a json file locally.  This can be done via the optional `--output` argument.  To save, use the `--output` argument followed by the file name.  Results are stored with metadata from the run.
+
+```
+ python3 finders_keypers.py --keyarn arn:aws:kms:us-east-1:123412341234:key/aaaaaaaa-aaaa-1111-aaaa-aaaa1111aaaa --output finders_keypers_sample_run.json
+```
+
 ### Requirements and Installation
 
 * Python & Boto3
