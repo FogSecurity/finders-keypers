@@ -4,6 +4,7 @@ import argparse
 import boto3
 import botocore
 import json
+from datetime import datetime
 from modules.service_key_finder import find_kms_key_usage
 
 '''
@@ -56,8 +57,17 @@ try:
             key_index = key_index + 1
 
     if args.output:
+        output = {}
+
+        output['metadata'] = {
+                'input_key': input_key_arn,
+                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+        output['results'] = key_resources
+
         with open(args.output, 'w') as f:
-            json.dump(key_resources, f, indent=4)
+            json.dump(output, f, indent=4)
 
 except Exception as e:
     print(f"Error while running Key Usage Finder: {e}")
