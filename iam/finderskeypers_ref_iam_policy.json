@@ -1,0 +1,47 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "FindersKeypersRead",
+            "Effect": "Allow",
+            "Action": [
+                "kms:ListKeys",
+                "kms:ListAliases",
+                "kms:DescribeKey",
+                "glue:GetDataCatalogEncryptionSettings",
+                "dynamodb:ListTables",
+                "dynamodb:DescribeTable",
+                "rds:DescribeDBClusters",
+                "rds:DescribeDBInstances",
+                "docdb-elastic:ListClusters",
+                "docdb-elastic:GetCluster",
+                "s3:GetEncryptionConfiguration",
+                "s3:ListAllMyBuckets",
+                "s3:GetBucketLocation",
+                "ec2:DescribeVolumes",
+                "qldb:ListLedgers",
+                "qldb:DescribeLedger",
+                "redshift:DescribeClusters",
+                "redshift-serverless:ListNamespaces",
+                "cassandra:Select",
+                "timestream:ListDatabases",
+                "timestream-influxdb:ListDbInstances",
+                "timestream:DescribeEndpoints",
+                "elasticache:DescribeGlobalReplicationGroups",
+                "elasticache:DescribeReplicationGroups",
+                "elasticache:DescribeServerlessCaches",
+                "secretsmanager:ListSecrets",
+                "ssm:DescribeParameters",
+                "elasticfilesystem:DescribeFileSystems",
+                "sqs:ListQueues",
+                "sqs:GetQueueAttributes",
+                "sns:ListTopics",
+                "sns:GetTopicAttributes",
+                "fsx:DescribeFileSystems",
+                "mq:ListBrokers",
+                "mq:DescribeBroker"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
