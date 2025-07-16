@@ -66,7 +66,9 @@ Total Number of Resources encrypted with KMS Key Provided: 6
 * Python & Boto3
 * AWS Credentials and Access.
 
-For IAM Permissions, Finders Keypers does not require non-read permissions (such as create, delete, or modification).  We recommend least privilege permissions.  Minimum permissions can be found in the [iam/](iam/) folder.  The AWS managed - job function `ReadOnlyAccess` policy can be used with Finders Keypers.  We recommend also checking KMS key policies, organizational policies such as RCPs and SCPs if there are access issues and to ensure Finders Keypers has access.
+For IAM Permissions, Finders Keypers does not require non-read permissions (such as create, delete, or modification).  We recommend least privilege permissions.  Permissions necessary can be found in the [iam/](iam/) folder.  The AWS managed - job function `ReadOnlyAccess` policy can be used with Finders Keypers.  For a complete scan, Finders Keypers uses permissions for each service you want to scan.  In some cases, the `SecurityAudit` policy could suffice, but we recommend starting with `ReadOnlyAccess` to ensure complete coverage. The `ViewOnlyAccess` policy provided by AWS is limited and will not work with Finders Keypers.
+
+We recommend also checking KMS key policies, organizational policies such as RCPs and SCPs if there are access issues and to ensure Finders Keypers has access.  
 
 Requirements can be installed via pip3 install and the `requirements.txt` file.  A python virtual environment can be used if desired.
 
