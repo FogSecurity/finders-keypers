@@ -4,6 +4,12 @@ import json
 
 #Module processes KMS Key Policies to check for potential cross-account usage.
 
+def get_key_account(key_arn):
+    
+    split_arn = key_arn.split(":")
+    #key_region = split_arn[3]
+    key_account = split_arn[4]
+    print(key_account)
 
 def get_key_policy(session, key_region, input_key_arn):
     try:
@@ -22,11 +28,18 @@ def parse_policy(raw_key_policy):
 def check_external_principal(statement):
 
     principals = statement['Principal']
-
+    print(principals)
+    ext_principals = []
     if principals == "*":
         #TODO: Check Conditions
-    
-    print(principals)    
+        ext_principals.extend(["*"])
+    elif principals.get('AWS'):
+        print (principals['AWS'])
+    else:
+        return []
+
+    #Need to process Federated, CanonicalUser, and Service
+      
     # Potential Options AWS, CanonicalUser, Service, Federated, *
     #Canonical User
 
@@ -35,8 +48,9 @@ def check_external_principal(statement):
     #Asterisk
 
     #Available Conditions
+    
 
-def find_external_accounts(key_policy): 
+def find_external_accounts(key_policy, key_account): 
 
     statement_block = key_policy['Statement']
     ext_accounts = []
@@ -46,7 +60,7 @@ def find_external_accounts(key_policy):
         if effect == 'Allow':
             #Cannot use NotPrincipal with Allow
             ext_principals = check_external_principal(statement)
-            ext_accounts = ext_accounts + ext_principals
+            ext_accounts.append(ext_principals)
             #Principal is external
         action = statement['Action']
         
