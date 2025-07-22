@@ -23,6 +23,9 @@ def check_external_principal(statement):
 
     principals = statement['Principal']
 
+    if principals == "*":
+        #TODO: Check Conditions
+    
     print(principals)    
     # Potential Options AWS, CanonicalUser, Service, Federated, *
     #Canonical User
@@ -36,21 +39,18 @@ def check_external_principal(statement):
 def find_external_accounts(key_policy): 
 
     statement_block = key_policy['Statement']
-
+    ext_accounts = []
     for statement in statement_block:
         effect = statement['Effect']
         
         if effect == 'Allow':
-            
             #Cannot use NotPrincipal with Allow
-            check_external_principal(statement)
-
+            ext_principals = check_external_principal(statement)
+            ext_accounts = ext_accounts + ext_principals
             #Principal is external
-
-            #Condition is external
         action = statement['Action']
-        resource = statement['Resource']
-        principal = statement['Principal'] #Can this be optional?
-        condition = statement.get('Condition')
-
+        
+        #resource = statement['Resource']
+        #principal = statement['Principal'] #Can this be optional?
+        #condition = statement.get('Condition')
 
