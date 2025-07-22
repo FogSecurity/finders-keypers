@@ -21,8 +21,9 @@ def parse_policy(raw_key_policy):
 
 def check_external_principal(statement):
 
-    principals = []
+    principals = statement['Principal']
 
+    print(principals)    
     # Potential Options AWS, CanonicalUser, Service, Federated, *
     #Canonical User
 
@@ -51,7 +52,5 @@ def find_external_accounts(key_policy):
         resource = statement['Resource']
         principal = statement['Principal'] #Can this be optional?
         condition = statement.get('Condition')
-
-        print(effect)
 
 
