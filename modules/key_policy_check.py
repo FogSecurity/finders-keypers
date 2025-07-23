@@ -7,9 +7,9 @@ import json
 def get_key_account(key_arn):
     
     split_arn = key_arn.split(":")
-    #key_region = split_arn[3]
     key_account = split_arn[4]
-    print(key_account)
+
+    return key_account
 
 def get_key_policy(session, key_region, input_key_arn):
     try:
@@ -30,12 +30,15 @@ def check_external_principal(statement, key_account):
     principals = statement['Principal']
     print(principals)
     ext_principals = []
+
     if principals == "*":
         #TODO: Check Conditions
         ext_principals.extend(["*"])
+
     elif principals.get('AWS'):
         print (principals['AWS'])
         for principal in principals['AWS']:
+            print(principal)
             if principal == "*":
                 ext_principals.append("*")
             else:
@@ -45,11 +48,12 @@ def check_external_principal(statement, key_account):
                     if not arn_account == key_account:
                         ext_principals.append(principal)
                 except IndexError:
-                    print("Index Error for one of the Key Policy Principals")
+                    print("Index Error for one of the Key Policy Principals " + principal)
     
     else:
         return []
 
+    return ext_principals
     #Need to process Federated, CanonicalUser, and Service
       
     # Potential Options AWS, CanonicalUser, Service, Federated, *
@@ -79,4 +83,4 @@ def find_external_accounts(key_policy, key_account):
         #resource = statement['Resource']
         #principal = statement['Principal'] #Can this be optional?
         #condition = statement.get('Condition')
-
+    return ext_accounts
