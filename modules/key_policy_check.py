@@ -25,7 +25,7 @@ def parse_policy(raw_key_policy):
     key_policy = json.loads(raw_key_policy['Policy'])
     return key_policy 
 
-def check_external_principal(statement):
+def check_external_principal(statement, key_account):
 
     principals = statement['Principal']
     print(principals)
@@ -35,6 +35,18 @@ def check_external_principal(statement):
         ext_principals.extend(["*"])
     elif principals.get('AWS'):
         print (principals['AWS'])
+        for principal in principals['AWS']:
+            if principal == "*":
+                ext_principals.append("*")
+            else:
+                split_arn = principal.split(":")
+                try:
+                    arn_account = split_arn[4]
+                    if not arn_account == key_account:
+                        ext_principals.append(principal)
+                except IndexError:
+                    print("Index Error for one of the Key Policy Principals")
+    
     else:
         return []
 
@@ -59,7 +71,7 @@ def find_external_accounts(key_policy, key_account):
         
         if effect == 'Allow':
             #Cannot use NotPrincipal with Allow
-            ext_principals = check_external_principal(statement)
+            ext_principals = check_external_principal(statement, key_account)
             ext_accounts.append(ext_principals)
             #Principal is external
         action = statement['Action']
