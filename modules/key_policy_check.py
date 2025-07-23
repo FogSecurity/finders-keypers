@@ -65,6 +65,7 @@ def find_external_accounts(session, key_region, input_key_arn):
 
     raw_key_policy = get_key_policy(session, key_region, input_key_arn)
     key_policy = parse_policy(raw_key_policy)
+    key_account = get_key_account(input_key_arn)
 
     statement_block = key_policy['Statement']
     ext_accounts = []
