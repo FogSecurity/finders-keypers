@@ -61,7 +61,10 @@ def check_external_principal(statement, key_account):
     #TODO: Federated, CanonicalUser, and Service
     #TODO: Conditions
 
-def find_external_accounts(key_policy, key_account): 
+def find_external_accounts(session, key_region, input_key_arn): 
+
+    raw_key_policy = get_key_policy(session, key_region, input_key_arn)
+    key_policy = parse_policy(raw_key_policy)
 
     statement_block = key_policy['Statement']
     ext_accounts = []
