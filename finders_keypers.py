@@ -6,6 +6,7 @@ import botocore
 import json
 from datetime import datetime
 from modules.service_key_finder import find_kms_key_usage
+from modules.key_policy_check import find_external_accounts
 
 '''
 This requires IAM Permissions to List Keys, Describe Keys, and relevant service permissions.  
@@ -43,6 +44,7 @@ key_resources = []
 
 try:
     find_kms_key_usage(session, key_region, input_key_arn, key_resources)
+    ext_accounts = find_external_accounts(session, key_region, input_key_arn)
     print("Total Number of Resources encrypted with KMS Key Provided: " + str(len(key_resources)))
 
     key_index=0
