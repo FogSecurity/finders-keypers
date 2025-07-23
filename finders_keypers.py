@@ -45,6 +45,8 @@ key_resources = []
 try:
     find_kms_key_usage(session, key_region, input_key_arn, key_resources)
     ext_accounts = find_external_accounts(session, key_region, input_key_arn)
+    if len(ext_accounts) > 0:
+        print("From analyzing the key policy, there could be resources encrypted with KMS Key outside of this account.")
     print("Total Number of Resources encrypted with KMS Key Provided: " + str(len(key_resources)))
 
     key_index=0
