@@ -28,7 +28,6 @@ def parse_policy(raw_key_policy):
 def check_external_principal(statement, key_account):
 
     principals = statement['Principal']
-    print(principals)
     ext_principals = []
 
     if principals == "*":
@@ -36,9 +35,14 @@ def check_external_principal(statement, key_account):
         ext_principals.extend(["*"])
 
     elif principals.get('AWS'):
-        print (principals['AWS'])
-        for principal in principals['AWS']:
-            print(principal)
+        principals_list = []
+        if type(principals['AWS']) == list:
+            #Only 1 entry for principals
+            principals_list = principals['AWS']
+        else:
+            principals_list.append(principals['AWS'])
+            
+        for principal in principals_list:
             if principal == "*":
                 ext_principals.append("*")
             else:
@@ -54,17 +58,8 @@ def check_external_principal(statement, key_account):
         return []
 
     return ext_principals
-    #Need to process Federated, CanonicalUser, and Service
-      
-    # Potential Options AWS, CanonicalUser, Service, Federated, *
-    #Canonical User
-
-    #Account ID in Principal
-
-    #Asterisk
-
-    #Available Conditions
-    
+    #TODO: Federated, CanonicalUser, and Service
+    #TODO: Conditions
 
 def find_external_accounts(key_policy, key_account): 
 
@@ -76,7 +71,7 @@ def find_external_accounts(key_policy, key_account):
         if effect == 'Allow':
             #Cannot use NotPrincipal with Allow
             ext_principals = check_external_principal(statement, key_account)
-            ext_accounts.append(ext_principals)
+            ext_accounts.extend(ext_principals)
             #Principal is external
         action = statement['Action']
         
