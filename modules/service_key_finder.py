@@ -37,6 +37,11 @@ def find_kms_key_usage(session, key_region, input_key_arn, key_resources):
             find_s3_key_usage(session, key_region, input_key_arn, key_resources)
         except:
             print("Error with S3 Module")
+        
+        try:
+            find_s3_tables_key_usage(session, key_region, input_key_arn, key_resources)
+        except:
+            print("Error with S3 Tables Module")
 
         try:
             find_ebs_key_usage(session, key_region, input_key_arn, key_resources)
@@ -230,6 +235,34 @@ def find_s3_key_usage(session, key_region, input_key_arn, key_resources):
 
         if encryption_key == input_key_arn:
             key_resources_append('S3', 'S3 Bucket', bucket['Name'], 'Encryption At Rest', key_resources)
+
+def find_s3_tables_key_usage(session, key_region, input_key_arn, key_resources):
+    
+    s3_tables_client = session.client('s3tables', region_name=key_region)
+
+    s3_tables_buckets_results = (
+        s3_tables_client.get_paginator('list_table_buckets')
+        .paginate()
+        .build_full_result()
+    )
+
+    for table_bucket in s3_tables_buckets_results['tableBuckets']:
+        
+        try:
+            bucket_encryption_response  = s3_tables_client.get_table_bucket_encryption(
+                tableBucketARN=table_bucket['arn']
+            )
+            bucket_encryption = bucket_encryption_response['encryptionConfiguration']
+        
+        except s3_tables_client.exceptions.NotFoundException:
+            continue  # Skip if no encryption is set  
+        
+        if bucket_encryption.get('kmsKeyArn'):
+            encryption_key = bucket_encryption.get('kmsKeyArn')
+
+            if encryption_key == input_key_arn:
+                key_resources_append('S3 Tables', 'S3 Table Bucket', table_bucket['name'], 'Encryption At Rest', key_resources)
+
 
 def find_qldb_key_usage(session, key_region, input_key_arn, key_resources):
 
