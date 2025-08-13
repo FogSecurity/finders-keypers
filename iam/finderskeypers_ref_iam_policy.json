@@ -8,6 +8,7 @@
                 "kms:ListKeys",
                 "kms:ListAliases",
                 "kms:DescribeKey",
+                "kms:GetKeyPolicy",
                 "glue:GetDataCatalogEncryptionSettings",
                 "dynamodb:ListTables",
                 "dynamodb:DescribeTable",
