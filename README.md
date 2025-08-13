@@ -75,6 +75,7 @@ Finders Keypers now has an option to save run data to a json file locally.  This
 * AWS Credentials and Access.
 
 For IAM Permissions, Finders Keypers does not require non-read permissions (such as create, delete, or modification).  We recommend least privilege permissions.  Permissions necessary can be found in the [iam/](iam/) folder.  The AWS managed - job function `ReadOnlyAccess` policy can be used with Finders Keypers.  For a complete scan, Finders Keypers uses permissions for each service you want to scan.  In some cases, the `SecurityAudit` policy could suffice, but we recommend starting with `ReadOnlyAccess` to ensure complete coverage. The `ViewOnlyAccess` policy provided by AWS is limited and will not work with Finders Keypers.
+Note: Currently, S3 Table Bucket permissions are not in `ReadOnlyAccess`.  See IAM folder for necessary permissions.
 
 We recommend also checking KMS key policies, organizational policies such as RCPs and SCPs if there are access issues and to ensure Finders Keypers has access.  
 
@@ -96,7 +97,7 @@ For AWS Credentials and setting up the AWS CLI, see AWS CLI documentation on [cr
 
 ### Supported Services:
 
-Currently supports 21 AWS Services and 28 different resource types.
+Currently supports 22 AWS Services and 29 different resource types.
 
 #### AWS Compute:
 
@@ -123,6 +124,7 @@ Currently supports 21 AWS Services and 28 different resource types.
 #### AWS Storage:
 
 - AWS S3
+- AWS S3 Tables
 - Amazon Elastic File System (EFS)
 - Amazon FSx
 
@@ -137,6 +139,7 @@ Currently supports 21 AWS Services and 28 different resource types.
 
 ### Supported Resources:
 - S3 Buckets
+- S3 Table Buckets
 - EFS File Systems
 - Aurora Instances
 - Aurora Clusters

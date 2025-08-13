@@ -18,6 +18,8 @@
                 "s3:GetEncryptionConfiguration",
                 "s3:ListAllMyBuckets",
                 "s3:GetBucketLocation",
+                "s3tables:ListTableBuckets",
+                "s3tables:GetTableBucketEncryption",
                 "ec2:DescribeVolumes",
                 "qldb:ListLedgers",
                 "qldb:DescribeLedger",
